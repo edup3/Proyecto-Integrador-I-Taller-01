@@ -1,5 +1,33 @@
-<h1>Welcome to Bibliatica</h1>
-        {% comment %} <p>Here you can find a book with only its author or its name</p> {% endcomment %}
-        {% comment %} <p style="font-size: 20px;">Here you can find a book with only its author or its name</p> {% endcomment %}
-        <h2>Here you can find a book with only its author or its name</h2>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+</head>
+<body>
+    <div class="container">
+        <form action="">
+            <div class="mb-3">
+                <label for="searchBook" class="form-label">
+                    Search for a book:
+                </label>
+                <input type="text" class="form-control" name="searchBook" id="searchBook"/>
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+        <p>Searching for {{ searchTerm }}</p>
+        {% for book in books %}
+            <h2>{{ book.title }}</h2>
+            <h3>{{ book.author }}</h3>
+            {% if book.available %}
+                <p>Availability: Available</p>
+            {% else %}
+                <p>Availability: Rented until {{ book.availability }}</p>
+            {% endif %}
+            <img src="{{ book.image.url }}">
+            <a href="{% url 'book_description' book.id %}" class="btn btn-info">Description</a>
+        {% endfor %}
+    </div>
+</body>
+</html>

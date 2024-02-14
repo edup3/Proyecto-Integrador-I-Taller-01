@@ -17,9 +17,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from library import views as library_views
+from library.views import book_description
+
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', library_views.home),
-    path('about/', library_views.about)
+    path('about/', library_views.about),
+    path('book/<int:book_id>/', book_description, name='book_description'),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
