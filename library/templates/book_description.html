@@ -3,5 +3,5 @@
     <h3>{{ book.author }}</h3>
     <p>{% if book.available %}Available{% else %}Rented until {{ book.availability }}{% endif %}</p>
     <img src="{{ book.image.url }}">
-    <p>Description: {{ book.description }}</p>
+    <p>{{ book.description }}</p>
 </div>
