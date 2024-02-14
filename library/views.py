@@ -7,4 +7,4 @@ def home(request):
     return render(request, 'home.html')
 
 def about(request):
-    return HttpResponse('<h1>This is a website that allows a better library organization</h1>')
+    return render(request, 'about.html')
