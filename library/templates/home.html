@@ -21,9 +21,9 @@
             <h2>{{ book.title }}</h2>
             <h3>{{ book.author }}</h3>
             {% if book.available %}
-                <p>Availability: Available</p>
+                <p>Available</p>
             {% else %}
-                <p>Availability: Rented until {{ book.availability }}</p>
+                <p>Rented until {{ book.availability }}</p>
             {% endif %}
             <img src="{{ book.image.url }}">
             <a href="{% url 'book_description' book.id %}" class="btn btn-info">Description</a>
