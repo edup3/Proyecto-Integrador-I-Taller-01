@@ -25,7 +25,7 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', library_views.home),
+    path('', library_views.home, name='home'),
     path('about/', library_views.about),
     path('book_description/<int:book_id>/', book_description, name='book_description'),
     # path('change_availability/<int:book_id>/', views.change_availability, name='change_availability'),
