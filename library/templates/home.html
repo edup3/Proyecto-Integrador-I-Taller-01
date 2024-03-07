@@ -1,33 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-</head>
-<body>
-    <div class="container">
-        <form action="">
-            <div class="mb-3">
-                <label for="searchBook" class="form-label">
-                    Search for a book:
-                </label>
-                <input type="text" class="form-control" name="searchBook" id="searchBook"/>
-            </div>
-            <button type="submit" class="btn btn-primary">Search</button>
-        </form>
-        <p>Searching for {{ searchTerm }}</p>
+
+    
+<div class="container">
+    <form action="">
+        <div class="mb-3">
+            <label for="searchBook" class="form-label">
+                Search for a book:
+            </label>
+            <input type="text" class="form-control" name="searchBook" id="searchBook"/>
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+    <p>Searching for {{ searchTerm }}</p>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+
         {% for book in books %}
-            <h2>{{ book.title }}</h2>
-            <h3>{{ book.author }}</h3>
-            {% if book.available %}
-                <p>Available</p>
-            {% else %}
-                <p>Rented until {{ book.availability }}</p>
-            {% endif %}
-            <img src="{{ book.image.url }}">
-            <a href="{% url 'book_description' book.id %}" class="btn btn-info"><br>Description</a>
+
+        <div class="card mb-3" style="width: 18rem;">
+            <div class="card-body">
+                <h2 class="card-title">{{ book.title }}</h2>
+                <h3 class="card-text">{{ book.author }}</h3>
+                {% if book.available %}
+                    <p>Available</p>
+                {% else %}
+                    <p>Rented until {{ book.availability }}</p>
+                {% endif %}
+                <img src="{{ book.image.url }}">
+                <br>
+                <a href="{% url 'book_description' book.id %}" class="btn btn-info">Description</a>
+            </div>
+        </div>
+        &nbsp;&nbsp;&nbsp;
+
         {% endfor %}
+
     </div>
+</div>
 </body>
 </html>
+

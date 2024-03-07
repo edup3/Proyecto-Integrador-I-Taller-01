@@ -4,4 +4,10 @@
     <p>{% if book.available %}Available{% else %}Rented until {{ book.availability }}{% endif %}</p>
     <img src="{{ book.image.url }}">
     <p>{{ book.description }}</p>
+    <p>{% if book.available %}
+    <a href="{% url 'change_availability' book.id %}" class="btn btn-info">Reserve</a>
+    {% else %}
+    <a href="{% url 'change_availability' book.id %}" class="btn btn-info">Cancel reservation</a>
+    {% endif %}
+    </p>
 </div>
