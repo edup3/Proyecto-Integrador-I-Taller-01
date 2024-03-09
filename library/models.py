@@ -13,3 +13,6 @@ class Book(models.Model):
     real_availability = models.DateField(null=True, blank=True)
     reserved = models.BooleanField(default=False)
     reserved_date = models.DateField(null=True, blank=True)
+    total_ratings = models.IntegerField(default=0)
+    sum_ratings = models.IntegerField(default=0)
+    rating_average = models.DecimalField(max_digits=3, decimal_places=2, default=0)

@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 # Create your views here.
 
@@ -13,7 +13,21 @@ def home(request):
         books = Book.objects.filter(title__icontains=searchTerm)
     else:
         books = Book.objects.all()
+
     return render(request, 'home.html', {'books': books, 'searchTerm': searchTerm})
+
+def rate_book(request):
+    if request.method == 'POST':
+        book_id = request.POST.get('book_id')
+        rating = int(request.POST.get('rating'))
+        book = Book.objects.get(id=book_id)
+        total_ratings = book.total_ratings + 1
+        sum_ratings = book.sum_ratings + rating
+        book.rating_average = sum_ratings / total_ratings
+        book.total_ratings = total_ratings
+        book.sum_ratings = sum_ratings
+        book.save()
+    return redirect('home')  # Redirigir a la página de inicio después de puntuar el libro
 
 def about(request):
     return render(request, 'about.html')
@@ -22,13 +36,10 @@ def book_description(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
     return render(request, 'book_description.html', {'book': book})
 
-
 def adminrent(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
     
     return render(request, 'adminrent.html', {'book': book})
-
-
 
 
 def change_availability(request, book_id):
@@ -93,5 +104,5 @@ def verify_availability(request, book_id):
     book.save()
     
     
-    
+
     

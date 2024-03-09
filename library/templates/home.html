@@ -28,6 +28,53 @@
                 <img src="{{ book.image.url }}">
                 <br>
                 <a href="{% url 'book_description' book.id %}" class="btn btn-info">Description</a>
+                
+                <!-- Rating form -->
+                <form method="POST" action="{% url 'rate_book' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="book_id" value="{{ book.id }}">
+                    <style>
+                        .rating {
+                            display: inline-block;
+                            unicode-bidi: bidi-override;
+                            direction: rtl;
+                        }
+
+                        .rating input {
+                            display: none;
+                        }
+
+                        .rating label {
+                            display: inline-block;
+                            padding: 5px;
+                            font-size: 30px;
+                        }
+
+                        .rating label::before {
+                            content: "\2605";
+                        }
+
+                        .rating input:checked ~ label {
+                            color: #FFD700;
+                        }
+                    </style>
+                    <div class="rating">
+                        <input type="radio" id="star5_{{ book.id }}" name="rating" value="5">
+                        <label for="star5_{{ book.id }}" title="5 stars"></label>
+                        <input type="radio" id="star4_{{ book.id }}" name="rating" value="4">
+                        <label for="star4_{{ book.id }}" title="4 stars"></label>
+                        <input type="radio" id="star3_{{ book.id }}" name="rating" value="3">
+                        <label for="star3_{{ book.id }}" title="3 stars"></label>
+                        <input type="radio" id="star2_{{ book.id }}" name="rating" value="2">
+                        <label for="star2_{{ book.id }}" title="2 stars"></label>
+                        <input type="radio" id="star1_{{ book.id }}" name="rating" value="1">
+                        <label for="star1_{{ book.id }}" title="1 star"></label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit rating</button>
+                </form>
+                
+                <p>Rating average: {{ book.rating_average }}</p>
+                
                 {% comment %} <a href="{% url 'adminrent' book.id %}" class="btn btn-info">Admin</a> {% endcomment %}
 
             </div>

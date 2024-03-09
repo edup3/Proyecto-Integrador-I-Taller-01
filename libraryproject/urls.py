@@ -23,6 +23,8 @@ from library.views import *
 from django.conf.urls.static import static
 from django.conf import settings
 
+from library import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', library_views.home, name='home'),
@@ -32,8 +34,8 @@ urlpatterns = [
     path('reserve_book/<int:book_id>/', reserve_book, name='reserve_book'),
     path('change_real_availability/<int:book_id>/', change_real_availability, name='change_real_availability'),
     path('verify_availability/<int:book_id>/', verify_availability, name='verify_availability'),
-    path('adminrent/<int:book_id>/', adminrent, name='adminrent')
-    
+    path('adminrent/<int:book_id>/', adminrent, name='adminrent'),
+    path('rate-book/', views.rate_book, name='rate_book'),
     
     
     
