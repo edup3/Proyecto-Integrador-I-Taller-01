@@ -9,3 +9,7 @@ class Book(models.Model):
     image = models.ImageField(upload_to='library/images/')
     available = models.BooleanField(default=True)
     availability = models.DateField(null=True, blank=True)
+    real_available = models.BooleanField(default=True)
+    real_availability = models.DateField(null=True, blank=True)
+    reserved = models.BooleanField(default=False)
+    reserved_date = models.DateField(null=True, blank=True)

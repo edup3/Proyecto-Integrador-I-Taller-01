@@ -28,8 +28,15 @@ urlpatterns = [
     path('', library_views.home, name='home'),
     path('about/', library_views.about),
     path('book_description/<int:book_id>/', book_description, name='book_description'),
-    # path('change_availability/<int:book_id>/', views.change_availability, name='change_availability'),
     path('change_availability/<int:book_id>/', change_availability, name='change_availability'),
+    path('reserve_book/<int:book_id>/', reserve_book, name='reserve_book'),
+    path('change_real_availability/<int:book_id>/', change_real_availability, name='change_real_availability'),
+    path('verify_availability/<int:book_id>/', verify_availability, name='verify_availability'),
+    path('adminrent/<int:book_id>/', adminrent, name='adminrent')
+    
+    
+    
+    
     
 ]
 

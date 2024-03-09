@@ -28,6 +28,8 @@
                 <img src="{{ book.image.url }}">
                 <br>
                 <a href="{% url 'book_description' book.id %}" class="btn btn-info">Description</a>
+                {% comment %} <a href="{% url 'adminrent' book.id %}" class="btn btn-info">Admin</a> {% endcomment %}
+
             </div>
         </div>
         &nbsp;&nbsp;&nbsp;

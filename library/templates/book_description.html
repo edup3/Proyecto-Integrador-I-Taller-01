@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="container">
+{% comment %} <div class="container">
     <h2>{{ book.title }}</h2>
     <h3>{{ book.author }}</h3>
     <p>{% if book.available %}Available{% else %}Rented until {{ book.availability }}{% endif %}</p>
@@ -13,6 +13,31 @@
     <a href="{% url 'change_availability' book.id %}" class="btn btn-info">Cancel reservation</a>
     {% endif %}
     </p>
+</div>  {% endcomment %}
+
+<div class="container">
+    <h2>{{ book.title }}</h2>
+    <h3>{{ book.author }}</h3>
+    <img src="{{ book.image.url }}">
+    <p>{{ book.description }}</p>
+    
+    {% if book.real_available and not book.reserved %}
+        <p>Available</p>
+        <a href="{% url 'reserve_book' book.id %}" class="btn btn-info">Reserve</a>
+
+    {% elif book.real_available and book.reserved %}
+        <p>Reserved until <span>{{ book.reserved_date }}</span></p>
+        <a href="{% url 'reserve_book' book.id %}" class="btn btn-info">Cancel reservation</a>
+    {% elif book.real_available and book.reserved %}
+        <p>Reserved until <span>{{ book.reserved_date }}</span></p>
+    {% else %}
+        <p>Rented until <span>{{ book.real_availability }}</span></p>
+    {% endif %} 
+
 </div>
+
+
+
+
 
 {% endblock content %}
