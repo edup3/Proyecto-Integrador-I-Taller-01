@@ -29,13 +29,15 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', library_views.home, name='home'),
     path('about/', library_views.about),
-    path('book_description/<int:book_id>/', book_description, name='book_description'),
-    path('change_availability/<int:book_id>/', change_availability, name='change_availability'),
-    path('reserve_book/<int:book_id>/', reserve_book, name='reserve_book'),
-    path('change_real_availability/<int:book_id>/', change_real_availability, name='change_real_availability'),
-    path('verify_availability/<int:book_id>/', verify_availability, name='verify_availability'),
-    path('adminrent/<int:book_id>/', adminrent, name='adminrent'),
+    path('book_description/<int:book_id>/', book_details, name='book_description'),
+    path('book_details/<int:book_id>/', book_details, name='book_details'),  # Nueva URL para book_details
+    path('change_availability/<int:book_id>/', views.change_availability, name='change_availability'),
+    path('reserve_book/<int:book_id>/', views.reserve_book, name='reserve_book'),
+    path('change_real_availability/<int:book_id>/', views.change_real_availability, name='change_real_availability'),
+    path('verify_availability/<int:book_id>/', views.verify_availability, name='verify_availability'),
+    path('adminrent/<int:book_id>/', views.adminrent, name='adminrent'),
     path('rate-book/', views.rate_book, name='rate_book'),
+    path('submit_review/', views.submit_review, name='submit_review'),
     
     
     

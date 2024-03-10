@@ -1,25 +1,30 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
-# Create your views here.
-
-from .models import Book
+from .models import Book, Review
 from django.urls import reverse
 import datetime
+from django.http import HttpResponseBadRequest
 
 def home(request):
-
     searchTerm = request.GET.get('searchBook')
     if searchTerm:
         books = Book.objects.filter(title__icontains=searchTerm)
     else:
         books = Book.objects.all()
-
     return render(request, 'home.html', {'books': books, 'searchTerm': searchTerm})
 
 def rate_book(request):
     if request.method == 'POST':
         book_id = request.POST.get('book_id')
-        rating = int(request.POST.get('rating'))
+        rating = request.POST.get('rating')
+        
+        # Verificar si se proporcionó una calificación
+        if rating is None:
+            return HttpResponseBadRequest("No se ha proporcionado una calificación.")
+        
+        # Convertir la calificación a entero
+        rating = int(rating)
+        
         book = Book.objects.get(id=book_id)
         total_ratings = book.total_ratings + 1
         sum_ratings = book.sum_ratings + rating
@@ -27,14 +32,32 @@ def rate_book(request):
         book.total_ratings = total_ratings
         book.sum_ratings = sum_ratings
         book.save()
-    return redirect('home')  # Redirigir a la página de inicio después de puntuar el libro
+        
+    return redirect('home') 
+
+def submit_review(request):
+    if request.method == 'POST':
+        book_id = request.POST.get('book_id')
+        review_text = request.POST.get('reviewText')
+        book = Book.objects.get(id=book_id)
+        Review.objects.create(book=book, text=review_text)
+        # Redirige a la página de descripción del libro con el ancla del comentario
+        return HttpResponseRedirect(reverse('book_details', args=(book_id,)) + '#reviews')
+    else:
+        return redirect('home')
 
 def about(request):
     return render(request, 'about.html')
 
-def book_description(request, book_id):
+def book_details(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
-    return render(request, 'book_description.html', {'book': book})
+    reviews = Review.objects.filter(book=book)
+    return render(request, 'book_description.html', {'book': book, 'reviews': reviews})
+
+
+"""def book_description(request, book_id):
+    book = get_object_or_404(Book, pk=book_id)
+    return render(request, 'book_description.html', {'book': book})"""
 
 def adminrent(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
@@ -56,7 +79,7 @@ def change_availability(request, book_id):
     book.save()
     
     # Redirigir a la página de descripción del libro actualizado
-    return HttpResponseRedirect(reverse('book_description', args=(book_id,)))
+    return HttpResponseRedirect(reverse('book_details', args=(book_id,)))
 
 def reserve_book(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
@@ -72,7 +95,7 @@ def reserve_book(request, book_id):
     book.save()
     
     # Redirigir a la página de descripción del libro actualizado
-    return HttpResponseRedirect(reverse('book_description', args=(book_id,)))
+    return HttpResponseRedirect(reverse('book_details', args=(book_id,)))
 
 def change_real_availability(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
@@ -86,7 +109,7 @@ def change_real_availability(request, book_id):
         
     book.save()
     
-    return HttpResponseRedirect(reverse('book_description', args=(book_id,)))
+    return HttpResponseRedirect(reverse('book_details', args=(book_id,)))
 
 def verify_availability(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
@@ -103,6 +126,8 @@ def verify_availability(request, book_id):
         
     book.save()
     
+    # Redirigir a la página de descripción del libro actualizado
+    return HttpResponseRedirect(reverse('book_details', args=(book_id,)))
     
 
     
