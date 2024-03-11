@@ -23,13 +23,22 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ book.title }}</h5>
                     <h3 class="card-text">{{ book.author }}</h3>
-                    {% if book.available %}
-                        <p>Available</p>
+                    {% if book.real_available and not book.reserved %}
+                        <p class="card-text">Available</p>
+                        {% comment %} <a href="{% url 'reserve_book' book.id %}" class="btn btn-info">Reserve</a> {% endcomment %}
+                    {% elif book.real_available and book.reserved %}
+                        <p class="card-text">Reserved until <span>{{ book.reserved_date }}</span></p>
+                        {% comment %} <a href="{% url 'reserve_book' book.id %}" class="btn btn-info">Cancel reservation</a> {% endcomment %}
+                    {% elif book.real_available and book.reserved %}
+                        <p class="card-text">Reserved until <span>{{ book.reserved_date }}</span></p>
                     {% else %}
-                        <p>Rented until {{ book.availability }}</p>
+                        <p class="card-text">Rented until <span>{{ book.real_availability }}</span></p>
                     {% endif %}
                     <a href="{% url 'book_description' book.id %}" class="btn btn-info">Description</a>
+                    {% comment %} <a href="{% url 'adminrent' book.id %}" class="btn btn-info">Admin</a> {% endcomment %}
                     
+
+
                     <!-- Rating form -->
                     <form method="POST" action="{% url 'rate_book' %}">
                         {% csrf_token %}
