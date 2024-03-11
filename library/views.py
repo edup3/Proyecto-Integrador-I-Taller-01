@@ -4,6 +4,8 @@ from .models import Book, Review
 from django.urls import reverse
 import datetime
 from django.http import HttpResponseBadRequest
+from django.shortcuts import render
+from .forms import LibroForm
 
 def home(request):
     searchTerm = request.GET.get('searchBook')
@@ -128,6 +130,17 @@ def verify_availability(request, book_id):
     
     # Redirigir a la página de descripción del libro actualizado
     return HttpResponseRedirect(reverse('book_details', args=(book_id,)))
+
+def add_book(request):
+    if request.method == 'POST':
+        form = LibroForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            # Redirigir a una página de éxito o realizar otra acción
+    else:
+        form = LibroForm()
+    
+    return render(request, 'form.html', {'form': form})
     
 
     

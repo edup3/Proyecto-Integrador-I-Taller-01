@@ -38,10 +38,7 @@ urlpatterns = [
     path('adminrent/<int:book_id>/', views.adminrent, name='adminrent'),
     path('rate-book/', views.rate_book, name='rate_book'),
     path('submit_review/', views.submit_review, name='submit_review'),
-    
-    
-    
-    
+    path('form/', views.add_book, name='add_book'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
