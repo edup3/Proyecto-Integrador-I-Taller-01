@@ -16,7 +16,7 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from library import views as library_views
 from library.views import *
 
@@ -39,6 +39,9 @@ urlpatterns = [
     path('rate-book/', views.rate_book, name='rate_book'),
     path('submit_review/', views.submit_review, name='submit_review'),
     path('form/', views.add_book, name='add_book'),
+    path('mainapp/', include('mainapp.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
