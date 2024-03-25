@@ -9,7 +9,7 @@ simply run the next line in your Windows PowerShell:
 
 git clone https://github.com/SebasGirald1003/Proyecto-Integrador-I.git
 
-Then run "cd Proyecto-Integrador-I"
+Then run "cd Proyecto-Integrador-I" on your Windows Powershell
 
 ## Requirements
 
