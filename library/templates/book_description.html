@@ -54,7 +54,7 @@
                                     <button type="submit" class="btn btn-primary">Submit Review</button>
                                 </form>
                             {% else %}
-                                <p class="card-text">Please log in to leave a comment.</p>
+                                <p class="card-text">Please <a href="{% url 'login' %}">log in</a> to leave a comment.</p>
                             {% endif %}
                         </div>
                     </div>
@@ -81,7 +81,7 @@
                             <p class="card-text">Rented until <span>{{ book.real_availability }}</span></p>
                         {% endif %}
                     {% else %}
-                        <p class="card-text">Please log in to reserve this book..</p>
+                        <p class="card-text">Please <a href="{% url 'login' %}">log in</a> to reserve this book</p>
                     {% endif %}
                 </div>
             </div>
