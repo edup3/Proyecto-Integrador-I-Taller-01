@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .forms import *
+from django.urls import reverse
 
 
 # Create your views here.
@@ -8,7 +9,7 @@ from .forms import *
 
 @login_required
 def dashboard(request):
-    return render(request, 'registration/dashboard.html', {'section': 'dashboard'})
+    return redirect(reverse('home'))
 
 def register(request):
     if request.method == 'POST':
