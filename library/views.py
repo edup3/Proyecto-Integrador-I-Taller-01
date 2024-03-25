@@ -51,12 +51,14 @@ def rate_book(request):
     return redirect('home')
  
 
+@login_required
 def submit_review(request):
     if request.method == 'POST':
         book_id = request.POST.get('book_id')
         review_text = request.POST.get('reviewText')
         book = Book.objects.get(id=book_id)
-        Review.objects.create(book=book, text=review_text)
+        # Aquí asegúrate de asignar correctamente el usuario al crear la instancia de Review
+        Review.objects.create(book=book, user=request.user, text=review_text)
         # Redirige a la página de descripción del libro con el ancla del comentario
         return HttpResponseRedirect(reverse('book_details', args=(book_id,)) + '#reviews')
     else:
