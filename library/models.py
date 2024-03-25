@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Book(models.Model):
     title = models.CharField(max_length=100)
@@ -17,5 +18,6 @@ class Book(models.Model):
 
 class Review(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Este campo almacena al usuario que deja la revisión
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
