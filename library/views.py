@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from .models import Book, Review, Rating
 from django.urls import reverse
 import datetime
@@ -7,6 +7,8 @@ from django.http import HttpResponseBadRequest
 from django.shortcuts import render
 from .forms import LibroForm
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
 
 
 def home(request):
@@ -95,21 +97,35 @@ def change_availability(request, book_id):
     # Redirigir a la página de descripción del libro actualizado
     return HttpResponseRedirect(reverse('book_details', args=(book_id,)))
 
+@login_required
 def reserve_book(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
+    user = request.user
+    
+    # Verificar si el libro está reservado y si el usuario actual realizó esa reserva
+    if book.reserved and book.reserved_by != user and not user.is_staff:
+        # Mostrar un mensaje de error en la misma página
+        messages.error(request, "You are not authorized to cancel this reservation.")
+        # Obtener las reseñas del libro para pasarlas a la plantilla
+        reviews = Review.objects.filter(book=book)
+        # Renderizar la página de descripción del libro actualizada con el mensaje de error y las reseñas
+        return render(request, 'book_description.html', {'book': book, 'reviews': reviews, 'error_message': "You are not authorized to cancel this reservation."})
     
     # Cambiar el estado de reserva
     if book.reserved:
         book.reserved = False
         book.reserved_date = None
+        book.reserved_by = None  # Limpiar el campo del usuario que reservó
     else:
         book.reserved = True
         book.reserved_date = datetime.date.today() + datetime.timedelta(days=7)  # Establecer la fecha de reserva en 7 días desde hoy
+        book.reserved_by = user  # Establecer el usuario actual como el que reservó
     
     book.save()
     
     # Redirigir a la página de descripción del libro actualizado
     return HttpResponseRedirect(reverse('book_details', args=(book_id,)))
+
 
 
 

@@ -87,5 +87,12 @@
             </div>
         </div>
     </div>
+
+    <!-- Espacio para mostrar el mensaje de error -->
+    {% if error_message %}
+        <div class="alert alert-danger mt-4" role="alert">
+            {{ error_message }}
+        </div>
+    {% endif %}
 </div>
 {% endblock content %}

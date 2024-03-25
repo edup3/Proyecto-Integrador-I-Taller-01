@@ -12,9 +12,11 @@ class Book(models.Model):
     real_availability = models.DateField(null=True, blank=True)
     reserved = models.BooleanField(default=False)
     reserved_date = models.DateField(null=True, blank=True)
+    reserved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     total_ratings = models.IntegerField(default=0)
     sum_ratings = models.IntegerField(default=0)
     rating_average = models.DecimalField(max_digits=3, decimal_places=2, default=0)
+
 
 class Review(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
