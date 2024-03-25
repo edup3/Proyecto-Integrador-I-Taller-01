@@ -18,6 +18,15 @@ class Book(models.Model):
 
 class Review(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Este campo almacena al usuario que deja la revisión
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)  # Hacer el campo anulable
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    
+class Rating(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    value = models.IntegerField()
+
+    class Meta:
+        unique_together = ('book', 'user')

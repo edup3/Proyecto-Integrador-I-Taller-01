@@ -43,15 +43,19 @@
                     <div class="card mt-4">
                         <div class="card-body">
                             <h3 class="card-title">Leave a Review</h3>
-                            <form method="POST" action="{% url 'submit_review' %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="book_id" value="{{ book.id }}">
-                                <div class="mb-3">
-                                    <label for="reviewText" class="form-label">Your Review:</label>
-                                    <textarea class="form-control" name="reviewText" id="reviewText" rows="3" style="resize: none;"></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Submit Review</button>
-                            </form>
+                            {% if user.is_authenticated %}
+                                <form method="POST" action="{% url 'submit_review' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="book_id" value="{{ book.id }}">
+                                    <div class="mb-3">
+                                        <label for="reviewText" class="form-label">Your Review:</label>
+                                        <textarea class="form-control" name="reviewText" id="reviewText" rows="3" style="resize: none;"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                                </form>
+                            {% else %}
+                                <p class="card-text">Please log in to leave a comment.</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -64,16 +68,20 @@
         <div class="col-md-12">
             <div class="card h-100">
                 <div class="card-body text-center">
-                    {% if book.real_available and not book.reserved %}
-                        <p class="card-text">Available</p>
-                        <a href="{% url 'reserve_book' book.id %}" class="btn btn-info">Reserve</a>
-                    {% elif book.real_available and book.reserved %}
-                        <p class="card-text">Reserved until <span>{{ book.reserved_date }}</span></p>
-                        <a href="{% url 'reserve_book' book.id %}" class="btn btn-info">Cancel reservation</a>
-                    {% elif book.real_available and book.reserved %}
-                        <p class="card-text">Reserved until <span>{{ book.reserved_date }}</span></p>
+                    {% if user.is_authenticated %}
+                        {% if book.real_available and not book.reserved %}
+                            <p class="card-text">Available</p>
+                            <a href="{% url 'reserve_book' book.id %}" class="btn btn-info">Reserve</a>
+                        {% elif book.real_available and book.reserved %}
+                            <p class="card-text">Reserved until <span>{{ book.reserved_date }}</span></p>
+                            <a href="{% url 'reserve_book' book.id %}" class="btn btn-info">Cancel reservation</a>
+                        {% elif book.real_available and book.reserved %}
+                            <p class="card-text">Reserved until <span>{{ book.reserved_date }}</span></p>
+                        {% else %}
+                            <p class="card-text">Rented until <span>{{ book.real_availability }}</span></p>
+                        {% endif %}
                     {% else %}
-                        <p class="card-text">Rented until <span>{{ book.real_availability }}</span></p>
+                        <p class="card-text">Please log in to reserve this book..</p>
                     {% endif %}
                 </div>
             </div>

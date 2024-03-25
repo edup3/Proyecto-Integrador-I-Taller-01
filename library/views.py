@@ -1,11 +1,13 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import Book, Review
+from .models import Book, Review, Rating
 from django.urls import reverse
 import datetime
 from django.http import HttpResponseBadRequest
 from django.shortcuts import render
 from .forms import LibroForm
+from django.contrib.auth.decorators import login_required
+
 
 def home(request):
     searchTerm = request.GET.get('searchBook')
@@ -15,27 +17,37 @@ def home(request):
         books = Book.objects.all()
     return render(request, 'home.html', {'books': books, 'searchTerm': searchTerm})
 
+@login_required
 def rate_book(request):
     if request.method == 'POST':
         book_id = request.POST.get('book_id')
         rating = request.POST.get('rating')
         
-        # Verificar si se proporcionó una calificación
-        if rating is None:
+        if not rating:
             return HttpResponseBadRequest("No se ha proporcionado una calificación.")
         
-        # Convertir la calificación a entero
         rating = int(rating)
         
-        book = Book.objects.get(id=book_id)
-        total_ratings = book.total_ratings + 1
-        sum_ratings = book.sum_ratings + rating
+        book = get_object_or_404(Book, id=book_id)
+        user = request.user
+        
+        # Verificar si el usuario ya ha dejado un rating para este libro
+        existing_rating = Rating.objects.filter(book=book, user=user).exists()
+        if existing_rating:
+            return HttpResponseBadRequest("Ya has dejado un rating para este libro.")
+        
+        # Crear el rating
+        Rating.objects.create(book=book, user=user, value=rating)
+        
+        # Calcular el rating promedio del libro
+        ratings = Rating.objects.filter(book=book)
+        total_ratings = ratings.count()
+        sum_ratings = sum(rating.value for rating in ratings)
         book.rating_average = sum_ratings / total_ratings
-        book.total_ratings = total_ratings
-        book.sum_ratings = sum_ratings
         book.save()
         
-    return redirect('home') 
+    return redirect('home')
+ 
 
 def submit_review(request):
     if request.method == 'POST':
@@ -98,6 +110,8 @@ def reserve_book(request, book_id):
     
     # Redirigir a la página de descripción del libro actualizado
     return HttpResponseRedirect(reverse('book_details', args=(book_id,)))
+
+
 
 def change_real_availability(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
