@@ -13,10 +13,21 @@ from django.contrib import messages
 
 def home(request):
     searchTerm = request.GET.get('searchBook')
+    sort_option = request.GET.get('sort')
+    save_books = ''
+
     if searchTerm:
         books = Book.objects.filter(title__icontains=searchTerm)
     else:
         books = Book.objects.all()
+
+
+    if sort_option == 'asc':
+        books = books.order_by('rating_average')
+    elif sort_option == 'desc':
+        books = books.order_by('-rating_average')
+
+    
     return render(request, 'home.html', {'books': books, 'searchTerm': searchTerm})
 
 @login_required
