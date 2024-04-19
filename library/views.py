@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirec
 from .models import Book, Review, Rating
 from django.urls import reverse
 import datetime
+from datetime import date, timedelta
 from django.http import HttpResponseBadRequest
 from django.shortcuts import render
 from .forms import LibroForm
@@ -12,6 +13,7 @@ from django.contrib import messages
 
 
 def home(request):
+    cancel_reservation_automatic(request)
     searchTerm = request.GET.get('searchBook')
     sort_option = request.GET.get('sort')
     save_books = ''
@@ -184,6 +186,15 @@ def add_book(request):
         form = LibroForm()
     
     return render(request, 'form.html', {'form': form})
+
+def cancel_reservation_automatic(request):
+    expired_reservations = Book.objects.filter(reserved=True, reserved_date__lte=date.today() - timedelta(days=7))
+    for book in expired_reservations:
+        book.reserved = False
+        book.reserved_date = None
+        book.reserved_by = None
+        book.save()
+
     
 
     
