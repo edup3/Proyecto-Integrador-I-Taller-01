@@ -138,3 +138,11 @@ LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.office365.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'proyecto1test@hotmail.com'  # Cambia 'cuenta1@hotmail.com' por la dirección real de Hotmail que estás usando como remitente
+EMAIL_HOST_PASSWORD = 'Eafit@123'  # La contraseña de 'cuenta1'
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'proyecto1test@hotmail.com'
