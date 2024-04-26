@@ -34,6 +34,7 @@ def home(request):
 
 @login_required
 def rate_book(request):
+    cancel_reservation_automatic(request)
     if request.method == 'POST':
         book_id = request.POST.get('book_id')
         rating = request.POST.get('rating')
@@ -66,6 +67,7 @@ def rate_book(request):
 
 @login_required
 def submit_review(request):
+    cancel_reservation_automatic(request)
     if request.method == 'POST':
         book_id = request.POST.get('book_id')
         review_text = request.POST.get('reviewText')
@@ -78,9 +80,11 @@ def submit_review(request):
         return redirect('home')
 
 def about(request):
+    cancel_reservation_automatic(request)
     return render(request, 'about.html')
 
 def book_details(request, book_id):
+    cancel_reservation_automatic(request)
     book = get_object_or_404(Book, pk=book_id)
     reviews = Review.objects.filter(book=book)
     return render(request, 'book_description.html', {'book': book, 'reviews': reviews})
@@ -91,12 +95,14 @@ def book_details(request, book_id):
     return render(request, 'book_description.html', {'book': book})"""
 
 def adminrent(request, book_id):
+    cancel_reservation_automatic(request)
     book = get_object_or_404(Book, pk=book_id)
     
     return render(request, 'adminrent.html', {'book': book})
 
 
 def change_availability(request, book_id):
+    cancel_reservation_automatic(request)
     book = get_object_or_404(Book, pk=book_id)
     
     # Cambiar el estado de disponibilidad
@@ -114,6 +120,7 @@ def change_availability(request, book_id):
 
 @login_required
 def reserve_book(request, book_id):
+    cancel_reservation_automatic(request)
     book = get_object_or_404(Book, pk=book_id)
     user = request.user
     
@@ -145,6 +152,7 @@ def reserve_book(request, book_id):
 
 
 def change_real_availability(request, book_id):
+    cancel_reservation_automatic(request)
     book = get_object_or_404(Book, pk=book_id)
     
     if book.real_available:
@@ -159,6 +167,7 @@ def change_real_availability(request, book_id):
     return HttpResponseRedirect(reverse('book_details', args=(book_id,)))
 
 def verify_availability(request, book_id):
+    cancel_reservation_automatic(request)
     book = get_object_or_404(Book, pk=book_id)
     
     if book.real_available and not book.reserved:
@@ -177,6 +186,7 @@ def verify_availability(request, book_id):
     return HttpResponseRedirect(reverse('book_details', args=(book_id,)))
 
 def add_book(request):
+    cancel_reservation_automatic(request)
     if request.method == 'POST':
         form = LibroForm(request.POST, request.FILES)
         if form.is_valid():
@@ -188,7 +198,7 @@ def add_book(request):
     return render(request, 'form.html', {'form': form})
 
 def cancel_reservation_automatic(request):
-    expired_reservations = Book.objects.filter(reserved=True, reserved_date__lte=date.today() - timedelta(days=7))
+    expired_reservations = Book.objects.filter(reserved=True, reserved_date__lt=date.today())
     for book in expired_reservations:
         book.reserved = False
         book.reserved_date = None
