@@ -45,10 +45,12 @@
                         <p class="card-text">Available</p>
                     {% elif book.real_available and book.reserved %}
                         <p class="card-text">Reserved until <span>{{ book.reserved_date }}</span></p>
-                    {% elif book.real_available and book.reserved %}
-                        <p class="card-text">Reserved until <span>{{ book.reserved_date }}</span></p>
-                    {% else %}
-                        <p class="card-text">Rented until <span>{{ book.real_availability }}</span></p>
+                    {% elif not book.real_available %}
+                        {% if book.real_availability %}
+                            <p class="card-text">Rented until <span>{{ book.real_availability }}</span></p>
+                        {% else %}
+                            <p class="card-text">Rented</p>
+                        {% endif %}
                     {% endif %}
                     <a href="{% url 'book_description' book.id %}" class="btn btn-info">Description</a>
 
@@ -83,25 +85,19 @@
                                 }
                             </style>
                             <div class="rating">
-                                <input type="radio" id="star5_{{ book.id }}" name="rating" value="5">
-                                <label for="star5_{{ book.id }}" title="5 stars"></label>
-                                <input type="radio" id="star4_{{ book.id }}" name="rating" value="4">
-                                <label for="star4_{{ book.id }}" title="4 stars"></label>
-                                <input type="radio" id="star3_{{ book.id }}" name="rating" value="3">
-                                <label for="star3_{{ book.id }}" title="3 stars"></label>
-                                <input type="radio" id="star2_{{ book.id }}" name="rating" value="2">
-                                <label for="star2_{{ book.id }}" title="2 stars"></label>
-                                <input type="radio" id="star1_{{ book.id }}" name="rating" value="1">
-                                <label for="star1_{{ book.id }}" title="1 star"></label>
+                                <input type="radio" id="star5_{{ book.id }}" name="rating" value="5"><label for="star5_{{ book.id }}" title="5 stars"></label>
+                                <input type="radio" id="star4_{{ book.id }}" name="rating" value="4"><label for="star4_{{ book.id }}" title="4 stars"></label>
+                                <input type="radio" id="star3_{{ book.id }}" name="rating" value="3"><label for="star3_{{ book.id }}" title="3 stars"></label>
+                                <input type of radio" id="star2_{{ book.id }}" name="rating" value="2"><label for="star2_{{ book.id }}" title="2 stars"></label>
+                                <input type="radio" id="star1_{{ book.id }}" name="rating" value="1"><label for="star1_{{ book.id }}" title="1 star"></label>
                             </div>
                             <button type="button" onclick="submitRating({{ book.id }})" class="btn btn-primary">Submit rating</button>
                         </form>
                     {% else %}
-                        <p>Inicia sesión para dejar un rating.</p>
+                        <p>Please log in to leave a rating.</p>
                     {% endif %}
                     
                     <p>Rating average: {{ book.rating_average }}</p>
-                    
                 </div>
             </div>
         </div>
@@ -110,22 +106,17 @@
 </div>
 
 <script>
-
 function submitRating(bookId) {
-
-    // Enviar la solicitud AJAX para enviar el rating
     var form = document.getElementById('ratingForm_' + bookId);
     var formData = new FormData(form);
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status === 200) {
-                alert("¡Gracias por tu rating!");
-                // Actualizar la página si el rating fue exitoso
+                alert("Thank you for your rating!");
                 window.location.reload();
             } else if (xhr.status === 400) {
-                // Mostrar un mensaje de error si el usuario ya dejó un rating
-                alert("Ya has dejado un rating para este libro.");
+                alert("You have already left a rating for this book.");
             }
         }
     };
@@ -133,8 +124,6 @@ function submitRating(bookId) {
     xhr.setRequestHeader('X-CSRFToken', formData.get('csrfmiddlewaretoken'));
     xhr.send(formData);
 }
-
-
 </script>
 
 {% endblock content %}

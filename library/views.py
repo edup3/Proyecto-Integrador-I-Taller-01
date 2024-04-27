@@ -10,10 +10,13 @@ from .forms import LibroForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
+from django.utils import timezone
+from django.contrib.auth.models import User
 
 
 def home(request):
     cancel_reservation_automatic(request)
+    check_rented(request)
     searchTerm = request.GET.get('searchBook')
     sort_option = request.GET.get('sort')
     save_books = ''
@@ -35,6 +38,7 @@ def home(request):
 @login_required
 def rate_book(request):
     cancel_reservation_automatic(request)
+    check_rented(request)
     if request.method == 'POST':
         book_id = request.POST.get('book_id')
         rating = request.POST.get('rating')
@@ -68,6 +72,7 @@ def rate_book(request):
 @login_required
 def submit_review(request):
     cancel_reservation_automatic(request)
+    check_rented(request)
     if request.method == 'POST':
         book_id = request.POST.get('book_id')
         review_text = request.POST.get('reviewText')
@@ -81,10 +86,12 @@ def submit_review(request):
 
 def about(request):
     cancel_reservation_automatic(request)
+    check_rented(request)
     return render(request, 'about.html')
 
 def book_details(request, book_id):
     cancel_reservation_automatic(request)
+    check_rented(request)
     book = get_object_or_404(Book, pk=book_id)
     reviews = Review.objects.filter(book=book)
     return render(request, 'book_description.html', {'book': book, 'reviews': reviews})
@@ -96,6 +103,7 @@ def book_details(request, book_id):
 
 def adminrent(request, book_id):
     cancel_reservation_automatic(request)
+    check_rented(request)
     book = get_object_or_404(Book, pk=book_id)
     
     return render(request, 'adminrent.html', {'book': book})
@@ -103,6 +111,7 @@ def adminrent(request, book_id):
 
 def change_availability(request, book_id):
     cancel_reservation_automatic(request)
+    check_rented(request)
     book = get_object_or_404(Book, pk=book_id)
     
     # Cambiar el estado de disponibilidad
@@ -121,6 +130,7 @@ def change_availability(request, book_id):
 @login_required
 def reserve_book(request, book_id):
     cancel_reservation_automatic(request)
+    check_rented(request)
     book = get_object_or_404(Book, pk=book_id)
     user = request.user
     
@@ -153,6 +163,7 @@ def reserve_book(request, book_id):
 
 def change_real_availability(request, book_id):
     cancel_reservation_automatic(request)
+    check_rented(request)
     book = get_object_or_404(Book, pk=book_id)
     
     if book.real_available:
@@ -168,6 +179,7 @@ def change_real_availability(request, book_id):
 
 def verify_availability(request, book_id):
     cancel_reservation_automatic(request)
+    check_rented(request)
     book = get_object_or_404(Book, pk=book_id)
     
     if book.real_available and not book.reserved:
@@ -187,6 +199,7 @@ def verify_availability(request, book_id):
 
 def add_book(request):
     cancel_reservation_automatic(request)
+    check_rented(request)
     if request.method == 'POST':
         form = LibroForm(request.POST, request.FILES)
         if form.is_valid():
@@ -204,7 +217,118 @@ def cancel_reservation_automatic(request):
         book.reserved_date = None
         book.reserved_by = None
         book.save()
+        
+        
+def book_history(request):
+    pass
 
-    
 
+# def rent_book(request, book_id):
+#     book = get_object_or_404(Book, pk=book_id)
     
+#     if book.real_available:
+#         book.real_available = False
+#         book.real_availability = datetime.date.today() + datetime.timedelta(days=14)
+#         book.availability = datetime.date.today() + datetime.timedelta(days=14)
+#     else:
+#         book.real_available = True
+#         book.availability = None
+#         book.available = True
+#         book.reserved = False
+    
+#     book.save()
+    
+#     return HttpResponseRedirect(reverse('book_details', args=(book_id,)))
+        
+
+def check_rented(request):
+    today = timezone.now().date()  # Asegurarse de que la fecha es consciente de la zona horaria
+    book_list = Book.objects.filter(real_availability__lt=today)
+    for book in book_list:
+        book.real_availability = None
+        book.save()
+
+
+
+
+
+
+
+
+
+@staff_member_required
+def rent_name(request, book_id):
+    book = get_object_or_404(Book, pk=book_id)
+
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        user = User.objects.filter(username=username).first()
+        show_message_box = False
+        show_message_box2 = False
+        
+
+        if not user:
+            messages.error(request, "User does not exist.")
+            return render(request, 'rent_name.html', {'book': book})
+
+        if book.reserved:
+            # messages.error(request, "b reserved")
+            # return render(request, 'rent_name.html', {'book': book})
+            if book.reserved_by == user:
+                book.reserved = False
+                book.reserved_by = None
+                book.reserved_date = None
+                book.real_available = False
+                book.real_availability = timezone.now() + datetime.timedelta(days=14)
+                book.availability = timezone.now() + datetime.timedelta(days=14)
+                book.save()
+                message = f"The book was successfully rented to {username} until {book.real_availability}."
+                return render(request, 'rent_name.html', {'book': book, 'message': message, 'show_message_box2': True, 'username': username})
+            else:
+                message = f"This book is currently reserved by {book.reserved_by.username} until {book.reserved_date}. Do you want to rent it to {username}?"
+                return render(request, 'rent_name.html', {'book': book, 'message': message, 'show_message_box': True, 'username': username})
+        else:
+            book.reserved = False
+            book.reserved_by = None
+            book.reserved_date = None
+            book.real_available = False
+            book.real_availability = timezone.now() + datetime.timedelta(days=14)
+            book.availability = timezone.now() + datetime.timedelta(days=14)
+            book.save()
+            message = f"The book was successfully rented to {username} until {book.real_availability}."
+            return render(request, 'rent_name.html', {'book': book, 'message': message, 'show_message_box2': True, 'username': username})
+    return render(request, 'rent_name.html', {'book': book})
+            
+            
+@staff_member_required
+def confirm_rental(request, book_id, username):
+    book = get_object_or_404(Book, pk=book_id)
+    show_message_box2 = False
+    
+    user = User.objects.filter(username=username).first()
+    book.reserved = False
+    book.reserved_by = None
+    book.reserved_date = None
+    book.real_available = False
+    book.real_availability = timezone.now() + datetime.timedelta(days=14)
+    book.availability = timezone.now() + datetime.timedelta(days=14)
+    book.save()
+    
+    
+    message = f"The book was successfully rented to {username} until {book.real_availability}."
+    return render(request, 'rent_name.html', {'book': book, 'message': message, 'show_message_box2': True, 'username': username})
+
+@staff_member_required
+def cancel_rent(request, book_id):
+    book = get_object_or_404(Book, pk=book_id)
+    book.real_available = True
+    book.real_availability = None
+    book.availability = None
+    book.available = True
+    book.reserved = False
+    book.reserved_by = None
+    book.reserved_date = None
+    book.save()
+    return redirect('book_description', book_id=book_id)
+            
+       

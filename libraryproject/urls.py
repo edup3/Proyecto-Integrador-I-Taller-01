@@ -40,6 +40,13 @@ urlpatterns = [
     path('submit_review/', views.submit_review, name='submit_review'),
     path('form/', views.add_book, name='add_book'),
     path('mainapp/', include('mainapp.urls')),
+    path('book_history/', views.book_history, name='book_history'),
+    path('rent_name/<int:book_id>/', library_views.rent_name, name='rent_name'),  # URL para procesar el alquiler del libro
+    path('book_description/<int:book_id>/<str:username>/', views.confirm_rental, name='confirm_rental'),
+    path('cancel_rent/<int:book_id>/', views.cancel_rent, name='cancel_rent'),
+    
+
+    
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

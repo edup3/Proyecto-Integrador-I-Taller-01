@@ -69,6 +69,7 @@
             <div class="card h-100">
                 <div class="card-body text-center">
                     {% if user.is_authenticated %}
+                        
                         {% if book.real_available and not book.reserved %}
                             <p class="card-text">Available</p>
                             <a href="{% url 'reserve_book' book.id %}" class="btn btn-info">Reserve</a>
@@ -82,6 +83,14 @@
                         {% endif %}
                     {% else %}
                         <p class="card-text">Please <a href="{% url 'login' %}">log in</a> to reserve this book</p>
+                    {% endif %}
+                    <br><br><br>
+                    {% if user.is_staff %}
+                        {% if book.real_available %} 
+                            <a href="{% url 'rent_name' book.id %}" class="btn btn-info">Rent</a>
+                        {% else %}
+                            <a href="{% url 'cancel_rent' book.id %}" class="btn btn-info">Cancel Rent</a>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
