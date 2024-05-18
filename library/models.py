@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.db.models.signals import post_save
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -51,3 +51,24 @@ class Rating(models.Model):
 
     class Meta:
         unique_together = ('book', 'user')
+
+class BookHistory(models.Model):
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='bookhistory', default=None)
+    rented_books = models.ManyToManyField(Book, blank=True)
+
+#Esta función crea automáticamente un objeto de BookHistory asociado cuando se crea un nuevo usuario.
+def create_bookhistory_user(sender, instance, created, **kwargs):
+
+    if created:
+         BookHistory.objects.create(user=instance)
+
+#Esta función guarda automáticamente el historial de libros después de que se guarda el objeto User.
+def save_bookhistory_user(sender, instance, **kwargs): 
+    instance.bookhistory.save()
+
+# Estas 2 líneas de código conectan las funciones a las señales post_save para el modelo User.
+# Cuando se crea o actualiza un objeto User, estas funciones se ejecutan automáticamente.
+
+post_save.connect(create_bookhistory_user, sender=User)
+post_save.connect(save_bookhistory_user, sender=User)

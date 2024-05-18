@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
-from .models import Book, Review, Rating
+from .models import Book, Review, Rating, BookHistory
 from django.urls import reverse
 import datetime
 from datetime import date, timedelta
@@ -295,8 +295,6 @@ def cancel_reservation_automatic(request):
         book.save()
         
         
-def book_history(request):
-    pass
 
 
 # def rent_book(request, book_id):
@@ -325,11 +323,12 @@ def check_rented(request):
         book.save()
 
 
+def book_history(request):
+    actual_user = BookHistory.objects.get(user_id=request.user.id)
+    book_history = BookHistory.objects.get(user = request.user)
+    user = book_history.user
 
-
-
-
-
+    return render(request, 'book_history.html',{'book_history':book_history, 'user':user})
 
 
 @staff_member_required
@@ -339,6 +338,8 @@ def rent_name(request, book_id):
     if request.method == 'POST':
         username = request.POST.get('username')
         user = User.objects.filter(username=username).first()
+        book_history = BookHistory.objects.get(user = user)
+        history_book = book_history
         show_message_box = False
         show_message_box2 = False
         
@@ -358,6 +359,8 @@ def rent_name(request, book_id):
                 book.real_availability = timezone.now() + datetime.timedelta(days=14)
                 book.availability = timezone.now() + datetime.timedelta(days=14)
                 book.save()
+                book_history.rented_books.add(book)
+                book_history.save()
                 message = f"The book was successfully rented to {username} until {book.real_availability}."
                 return render(request, 'rent_name.html', {'book': book, 'message': message, 'show_message_box2': True, 'username': username})
             else:
@@ -371,6 +374,8 @@ def rent_name(request, book_id):
             book.real_availability = timezone.now() + datetime.timedelta(days=14)
             book.availability = timezone.now() + datetime.timedelta(days=14)
             book.save()
+            book_history.rented_books.add(book)
+            book_history.save()
             message = f"The book was successfully rented to {username} until {book.real_availability}."
             return render(request, 'rent_name.html', {'book': book, 'message': message, 'show_message_box2': True, 'username': username})
     return render(request, 'rent_name.html', {'book': book})
@@ -379,6 +384,7 @@ def rent_name(request, book_id):
 @staff_member_required
 def confirm_rental(request, book_id, username):
     book = get_object_or_404(Book, pk=book_id)
+    book_history = BookHistory.objects.get(user = user)
     show_message_box2 = False
     
     user = User.objects.filter(username=username).first()
@@ -389,7 +395,8 @@ def confirm_rental(request, book_id, username):
     book.real_availability = timezone.now() + datetime.timedelta(days=14)
     book.availability = timezone.now() + datetime.timedelta(days=14)
     book.save()
-    
+    book_history.rented_books.add(book)
+    book_history.save()
     
     message = f"The book was successfully rented to {username} until {book.real_availability}."
     return render(request, 'rent_name.html', {'book': book, 'message': message, 'show_message_box2': True, 'username': username})

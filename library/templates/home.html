@@ -91,10 +91,11 @@
                                 <input type="radio" id="star5_{{ book.id }}" name="rating" value="5"><label for="star5_{{ book.id }}" title="5 stars"></label>
                                 <input type="radio" id="star4_{{ book.id }}" name="rating" value="4"><label for="star4_{{ book.id }}" title="4 stars"></label>
                                 <input type="radio" id="star3_{{ book.id }}" name="rating" value="3"><label for="star3_{{ book.id }}" title="3 stars"></label>
-                                <input type of radio" id="star2_{{ book.id }}" name="rating" value="2"><label for="star2_{{ book.id }}" title="2 stars"></label>
+                                <input type="radio" id="star2_{{ book.id }}" name="rating" value="2"><label for="star2_{{ book.id }}" title="2 stars"></label>
                                 <input type="radio" id="star1_{{ book.id }}" name="rating" value="1"><label for="star1_{{ book.id }}" title="1 star"></label>
                             </div>
-                            <button type="button" onclick="submitRating({{ book.id }})" class="btn btn-primary">Submit rating</button>
+                            <button type="button" onclick="submitRating('{{ book.id }}')" class="btn btn-primary">Submit rating</button>
+
                         </form>
                     {% else %}
                         <p>Please log in to leave a rating.</p>

@@ -26,13 +26,17 @@
                             <a class="nav-link" href="{% url 'add_book' %}">Add book</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Book History</a>
+                            <a class="nav-link" href="{% url 'book_history' %}">Book History</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href={% url 'edit_user' %}>
                                 User Manager
                             </a>
                         </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'book_history' %}">Book History</a>
+                    </li>
                     {% endif %}
                 {% endif %}
             </ul>
