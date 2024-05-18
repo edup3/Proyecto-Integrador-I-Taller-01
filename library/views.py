@@ -12,7 +12,25 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django import forms
+from .models import User
+from django.contrib.auth import login, authenticate
 
+from django.contrib.auth.forms import UserCreationForm
+
+class RegisterForm(UserCreationForm):
+    first_name = forms.CharField(max_length=30, required=True, help_text='First name')
+    last_name = forms.CharField(max_length=30, required=True, help_text='Last name')
+    email = forms.EmailField(max_length=254, required=True, help_text='Email address')
+
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email', 'password']
 
 def home(request):
     cancel_reservation_automatic(request)
@@ -209,6 +227,64 @@ def add_book(request):
         form = LibroForm()
     
     return render(request, 'form.html', {'form': form})
+
+
+def register_user(request):
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            form.save()  # Guardar el nuevo usuario en la base de datos
+            return redirect('edit_user')  # Redirigir a la página de edición de usuarios
+    else:
+        form = RegisterForm()
+    return render(request, 'register_users.html', {'form': form})
+
+def edit_user(request):
+    # Obtén todos los usuarios de la base de datos
+    users = User.objects.all()
+
+    # Pasa los usuarios al contexto de renderizado
+    return render(request, 'edit_users.html', {'users': users})
+
+def delete_user(request):
+    users = User.objects.all()
+    return render(request, 'delete_users.html', {'users': users})
+
+def eliminar_usuario(request, user_id):
+
+    user = get_object_or_404(User, id=user_id)
+    
+    print('eliminando el usuario')
+    user.delete()
+        # Redirige a la misma página después de eliminar el usuario
+    return redirect('edit_user')
+
+       
+
+def editar_usuario(request, user_id):
+    # Obtener el usuario a editar
+    usuario = get_object_or_404(User, id=user_id)
+
+    if request.method == 'POST':
+        # Rellenar el formulario con los datos enviados en la solicitud POST
+        formulario = UserForm(request.POST, instance=usuario)
+        if formulario.is_valid():
+            # Guardar los cambios si el formulario es válido
+            usuario = formulario.save(commit=False)  # Obtener el usuario pero no guardar en la base de datos todavía
+            password = formulario.cleaned_data.get('password')  # Obtener la contraseña del formulario
+            if password:
+                usuario.set_password(password)  # Establecer la nueva contraseña
+            usuario.save()  # Guardar el usuario con los cambios
+            # Redirigir a la vista de edición de usuarios (o a donde quieras)
+            return redirect('edit_user')
+    else:
+        # Si la solicitud no es POST, mostrar el formulario con los datos del usuario
+        formulario = UserForm(instance=usuario)
+
+    # Renderizar el template 'editar_usuario.html' con el formulario y el usuario
+    return render(request, 'editar_usuario.html', {'formulario': formulario, 'usuario': usuario})
+
+
 
 def cancel_reservation_automatic(request):
     expired_reservations = Book.objects.filter(reserved=True, reserved_date__lt=date.today())

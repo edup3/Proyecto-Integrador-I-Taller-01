@@ -44,9 +44,11 @@ urlpatterns = [
     path('rent_name/<int:book_id>/', library_views.rent_name, name='rent_name'),  # URL para procesar el alquiler del libro
     path('book_description/<int:book_id>/<str:username>/', views.confirm_rental, name='confirm_rental'),
     path('cancel_rent/<int:book_id>/', views.cancel_rent, name='cancel_rent'),
-    
-
-    
+    path('register_users/', views.register_user, name='register_user'),
+    path('edit_users/', views.edit_user, name='edit_user'),
+    path('editar_usuario/<int:user_id>/', views.editar_usuario, name='editar_usuario'),
+    path('delete_users/', views.delete_user, name='delete_user'),
+    path('eliminar_usuario/<int:user_id>/', views.eliminar_usuario, name='eliminar_usuario')
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
