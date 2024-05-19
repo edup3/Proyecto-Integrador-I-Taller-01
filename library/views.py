@@ -50,6 +50,10 @@ def home(request):
         books = books.order_by('rating_average')
     elif sort_option == 'desc':
         books = books.order_by('-rating_average')
+    elif sort_option == 'genre':
+        books = books.order_by('bookdetails__genre')
+    elif sort_option == 'subject':
+        books = books.order_by('bookdetails__subject')
 
     
     return render(request, 'home.html', {'books': books, 'searchTerm': searchTerm})
