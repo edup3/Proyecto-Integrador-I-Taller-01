@@ -1,12 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
-from .models import Book, Review, Rating, BookHistory
+from .models import Book, Review, Rating, BookHistory, BookDetails
 from django.urls import reverse
 import datetime
 from datetime import date, timedelta
 from django.http import HttpResponseBadRequest
 from django.shortcuts import render
-from .forms import LibroForm
+from .forms import LibroForm, DetailsForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
@@ -15,6 +15,7 @@ from django.contrib.auth.models import User
 from django import forms
 from .models import User
 from django.contrib.auth import login, authenticate
+from django.template import loader
 
 from django.contrib.auth.forms import UserCreationForm
 
@@ -111,8 +112,9 @@ def book_details(request, book_id):
     cancel_reservation_automatic(request)
     check_rented(request)
     book = get_object_or_404(Book, pk=book_id)
+    details = BookDetails.objects.get(book = book)
     reviews = Review.objects.filter(book=book)
-    return render(request, 'book_description.html', {'book': book, 'reviews': reviews})
+    return render(request, 'book_description.html', {'book': book,'details':details, 'reviews': reviews})
 
 
 """def book_description(request, book_id):
@@ -221,13 +223,14 @@ def add_book(request):
     if request.method == 'POST':
         form = LibroForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            # Redirigir a una página de éxito o realizar otra acción
+            book = form.save()
+            book_id = book.id
+            return redirect('edit_book',book_id) 
+
     else:
         form = LibroForm()
     
     return render(request, 'form.html', {'form': form})
-
 
 def register_user(request):
     if request.method == 'POST':
@@ -275,7 +278,7 @@ def editar_usuario(request, user_id):
             if password:
                 usuario.set_password(password)  # Establecer la nueva contraseña
             usuario.save()  # Guardar el usuario con los cambios
-            # Redirigir a la vista de edición de usuarios (o a donde quieras)
+            # Redirigir a la vista de edición de usuarios 
             return redirect('edit_user')
     else:
         # Si la solicitud no es POST, mostrar el formulario con los datos del usuario
@@ -413,5 +416,34 @@ def cancel_rent(request, book_id):
     book.reserved_date = None
     book.save()
     return redirect('book_description', book_id=book_id)
+
+def edit_book(request, book_id):
+    cancel_reservation_automatic(request)
+    check_rented(request)
+    book = get_object_or_404(Book, pk=book_id)
+    details = BookDetails.objects.get(book = book)
+    
+    if request.method == 'POST':
+        form_book = LibroForm(request.POST, request.FILES, instance=book)
+        form_details = DetailsForm(request.POST, instance=details)
+
+        if form_book.is_valid() and form_details.is_valid():
+
+            form_book.save()
+            form_details.save()
+            return redirect('book_description', book_id=book_id)
+    else:
+        form_book = LibroForm()
+        form_details = DetailsForm()
+    
+    return render(request, 'edit_book.html', {'form_book': form_book,'form_details': form_details,'book':book,'bookdetails':details})
+
+
+def delete_book(request, book_id):
+    cancel_reservation_automatic(request)
+    check_rented(request)
+    book = get_object_or_404(Book, pk=book_id)
+
+    book.delete()
             
-       
+    return redirect('home')

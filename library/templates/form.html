@@ -28,6 +28,10 @@
             {{ form.reserved }}
             <label class="form-check-label" for="id_reserved">Reserved</label>
         </div>
+        <div class="form-group">
+            {{ form.rating_average.label_tag }}
+            <input type="text" class="form-control" id="id_rating_average" name="rating_average" required value=0>
+        </div>
         
         <button type="submit" class="btn btn-primary">Add book</button>
     </form>
