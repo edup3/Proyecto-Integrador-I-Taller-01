@@ -7,23 +7,13 @@
         <div class="col-md-4">
             <div class="card h-100">
                 <img src="{{ book.image.url }}" class="card-img-top img-thumbnail mb-3" alt="Book Cover">
-                {% if user.is_authenticated %}
-                    {% if user.is_staff %}
-                <a href="{% url 'edit_book' book.id %}" class="btn btn-info">Edit</a>
-                <a href="{% url 'delete_book' book.id %}" class="btn btn-danger">Delete</a>
-                    {% endif %}
-                {% endif %}
             </div>
         </div>
         <div class="col-md-8">
-            <div class="card h-100" >
-                <div class="card-body" style="max-height: 500px; overflow-y: auto;">
-                    <h2 class="card-title" style="text-align: center;">{{ book.title }}</h2>
-                    <h2 class="card-title" style="text-align: center;">{{ book.author }}</h2>
-                    <h3 class="card-subtitle mb-2 text-muted" style="text-align: center;">ISBN : {{details.isbn}}</h3>
-                    <h3 class="card-subtitle mb-2 text-muted" style="text-align: center;">Publisher : {{details.publisher}}</h3>
-                    <h3 class="card-subtitle mb-2 text-muted" style="text-align: center;">Genre : {{details.genre}}</h3>
-                    <h3 class="card-subtitle mb-2 text-muted" style="text-align: center;">Subject : {{details.subject}}</h3>
+            <div class="card h-100">
+                <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                    <h2 class="card-title">{{ book.title }}</h2>
+                    <h3 class="card-subtitle mb-2 text-muted">{{ book.author }}</h3>
                     <p class="card-text">{{ book.description }}</p>
                 </div>
             </div>
@@ -96,7 +86,7 @@
                     {% endif %}
                     <br><br><br>
                     {% if user.is_staff %}
-                        {% if book.real_available %}
+                        {% if book.real_available %} 
                             <a href="{% url 'rent_name' book.id %}" class="btn btn-info">Rent</a>
                         {% else %}
                             <a href="{% url 'cancel_rent' book.id %}" class="btn btn-info">Cancel Rent</a>
