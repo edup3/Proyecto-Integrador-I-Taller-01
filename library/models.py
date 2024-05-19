@@ -35,7 +35,25 @@ class Book(models.Model):
     sum_ratings = models.IntegerField(default=0)
     rating_average = models.DecimalField(max_digits=3, decimal_places=2, default=0)
 
+class BookDetails(models.Model):
+    book = models.OneToOneField(Book, on_delete=models.CASCADE, related_name='bookdetails', default=None)
+    isbn = models.CharField(max_length=13)
+    genre = models.CharField(max_length=100)
+    subject = models.CharField(max_length=100)
+    publisher = models.CharField(max_length=100)
 
+#Esta función crea automáticamente un objeto de BookHistory asociado cuando se crea un nuevo usuario.
+def create_bookdetails_book(sender, instance, created, **kwargs):
+
+    if created:
+         BookDetails.objects.create(book=instance)
+
+#Esta función guarda automáticamente el historial de libros después de que se guarda el objeto User.
+def save_bookdetails_book(sender, instance, **kwargs): 
+    instance.bookdetails.save()
+
+post_save.connect(create_bookdetails_book, sender=Book)
+post_save.connect(save_bookdetails_book, sender=Book)
 
 class Review(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
