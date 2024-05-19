@@ -29,6 +29,7 @@
                 Sort by
             </button>
             <div class="dropdown-menu" aria-labelledby="sortDropdown">
+                <input type="hidden" name="searchBook" value="{{ searchTerm }}">
                 <button class="dropdown-item" type="submit" name="sort" value="asc">Ascending score</button>
                 <button class="dropdown-item" type="submit" name="sort" value="desc">Descending score</button>
                 <button class="dropdown-item" type="submit" name="sort" value="genre">Genre</button>

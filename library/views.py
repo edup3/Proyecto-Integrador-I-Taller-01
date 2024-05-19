@@ -36,16 +36,18 @@ class UserForm(forms.ModelForm):
 def home(request):
     cancel_reservation_automatic(request)
     check_rented(request)
+    
+    # Obtiene el término de búsqueda y la opción de ordenación desde la solicitud
     searchTerm = request.GET.get('searchBook')
     sort_option = request.GET.get('sort')
-    save_books = ''
-
+    
+    # Filtra los libros según el término de búsqueda si existe
     if searchTerm:
         books = Book.objects.filter(title__icontains=searchTerm)
     else:
         books = Book.objects.all()
-
-
+    
+    # Aplica la ordenación según la opción seleccionada
     if sort_option == 'asc':
         books = books.order_by('rating_average')
     elif sort_option == 'desc':
@@ -54,9 +56,10 @@ def home(request):
         books = books.order_by('bookdetails__genre')
     elif sort_option == 'subject':
         books = books.order_by('bookdetails__subject')
-
     
-    return render(request, 'home.html', {'books': books, 'searchTerm': searchTerm})
+    # Renderiza la plantilla con los libros filtrados y ordenados, y los parámetros de búsqueda y ordenación
+    return render(request, 'home.html', {'books': books, 'searchTerm': searchTerm, 'sort_option': sort_option})
+
 
 @login_required
 def rate_book(request):
