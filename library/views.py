@@ -42,7 +42,7 @@ def home(request):
     sort_option = request.GET.get('sort')
     
     # Filtra los libros según el término de búsqueda si existe
-    if searchTerm and (searchTerm is not None or searchTerm != 'None'):
+    if searchTerm and searchTerm != 'None':
         books = Book.objects.filter(title__icontains=searchTerm)
     else:
         books = Book.objects.all()
