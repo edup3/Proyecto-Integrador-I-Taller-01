@@ -42,7 +42,7 @@ def home(request):
     sort_option = request.GET.get('sort')
     
     # Filtra los libros según el término de búsqueda si existe
-    if searchTerm:
+    if searchTerm and (searchTerm is not None or searchTerm != 'None'):
         books = Book.objects.filter(title__icontains=searchTerm)
     else:
         books = Book.objects.all()
@@ -348,8 +348,11 @@ def rent_name(request, book_id):
     if request.method == 'POST':
         username = request.POST.get('username')
         user = User.objects.filter(username=username).first()
-        book_history = BookHistory.objects.get(user = user)
-        history_book = book_history
+        if user:
+            book_history = BookHistory.objects.get(user = user)
+        else:
+            book_history = BookHistory()
+
         show_message_box = False
         show_message_box2 = False
         
@@ -368,6 +371,7 @@ def rent_name(request, book_id):
                 book.real_available = False
                 book.real_availability = timezone.now() + datetime.timedelta(days=14)
                 book.availability = timezone.now() + datetime.timedelta(days=14)
+                book.rented_by = user
                 book.save()
                 book_history.rented_books.add(book)
                 book_history.save()
@@ -383,6 +387,8 @@ def rent_name(request, book_id):
             book.real_available = False
             book.real_availability = timezone.now() + datetime.timedelta(days=14)
             book.availability = timezone.now() + datetime.timedelta(days=14)
+            book.rented_by = user
+
             book.save()
             book_history.rented_books.add(book)
             book_history.save()
