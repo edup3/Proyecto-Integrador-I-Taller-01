@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-c922t+tizlic2y*f()6k&z-#9ym_5pxpv_^x$n3y75(o_4^(kk
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['34.135.52.194']
+ALLOWED_HOSTS = ['34.135.52.194', '*']
 
 
 # Application definition
@@ -142,7 +142,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.office365.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'proyecto1test@hotmail.com'  # Cambia 'cuenta1@hotmail.com' por la dirección real de Hotmail que estás usando como remitente
+# Cambia 'cuenta1@hotmail.com' por la dirección real de Hotmail que estás usando como remitente
+EMAIL_HOST_USER = 'proyecto1test@hotmail.com'
 EMAIL_HOST_PASSWORD = 'Eafit@123'  # La contraseña de 'cuenta1'
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'proyecto1test@hotmail.com'
