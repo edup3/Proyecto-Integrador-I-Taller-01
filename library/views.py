@@ -18,7 +18,9 @@ from django.contrib.auth.models import User
 from .models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import View, CreateView, TemplateView, ListView, DetailView
-
+from .utils import cancel_reservation_automatic, check_rented, BookSorterService
+from .utils import BookService 
+from .interfaces import AbstractBookService  
 
 class DashboardView(LoginRequiredMixin, View):
     login_url = reverse_lazy('register')
@@ -155,13 +157,17 @@ def about(request):
     return render(request, 'about.html')
 
 
-def book_details(request, book_id):
-    cancel_reservation_automatic(request)
-    check_rented(request)
-    book = get_object_or_404(Book, pk=book_id)
-    details = BookDetails.objects.get(book=book)
-    reviews = Review.objects.filter(book=book)
-    return render(request, 'book_description.html', {'book': book, 'details': details, 'reviews': reviews})
+def book_details(request, book_id, service: AbstractBookService = BookService()):
+    service.handle_book_access(request)
+    book = service.get_book(book_id)
+    details = service.get_book_details(book)
+    reviews = service.get_reviews(book)
+
+    return render(request, 'book_description.html', {
+        'book': book,
+        'details': details,
+        'reviews': reviews
+    })
 
 
 """def book_description(request, book_id):
@@ -347,14 +353,7 @@ def editar_usuario(request, user_id):
     return render(request, 'editar_usuario.html', {'formulario': formulario, 'usuario': usuario})
 
 
-def cancel_reservation_automatic(request):
-    expired_reservations = Book.objects.filter(
-        reserved=True, reserved_date__lt=date.today())
-    for book in expired_reservations:
-        book.reserved = False
-        book.reserved_date = None
-        book.reserved_by = None
-        book.save()
+
 
 
 # def rent_book(request, book_id):
@@ -373,16 +372,6 @@ def cancel_reservation_automatic(request):
 #     book.save()
 
 #     return HttpResponseRedirect(reverse('book_details', args=(book_id,)))
-
-
-def check_rented(request):
-    # Asegurarse de que la fecha es consciente de la zona horaria
-    today = timezone.now().date()
-    book_list = Book.objects.filter(real_availability__lt=today)
-    for book in book_list:
-        book.real_availability = None
-        book.save()
-
 
 def book_history(request):
     actual_user = BookHistory.objects.get(user_id=request.user.id)
